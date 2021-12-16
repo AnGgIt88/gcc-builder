@@ -30,7 +30,7 @@ jobs:
         alias g++=g++-10
         git config --global user.name "${GITHUB_USER}"
         git config --global user.email "${GITHUB_EMAIL}"
-        git clone https://"${GITHUB_USER}":"${GITHUB_TOKEN}"@github.com/NFS-projects/gcc-arm64 ../gcc-arm64 -b gcc-master
+        git clone https://"${GITHUB_USER}":"${GITHUB_TOKEN}"@github.com/NFS-projects/gcc-arm64 ../gcc-arm64 -b 11.x
         rm -rf ../gcc-arm64/*
       env:
         GITHUB_EMAIL: ${{ secrets.EMAIL }}
@@ -82,7 +82,7 @@ jobs:
         git add . -f
         git commit -as -m "Release $GCC_NAME GCC ARM64 $(/bin/date)" -m "Build completed on: $(/bin/date)" -m "Configuration: $(/bin/cat /tmp/gcc-version)" -m "LLD: $(/bin/cat /tmp/lld-arm64-version)"
         git gc
-        git push origin gcc-master -f
+        git push origin 11.x -f
       env:
         GITHUB_EMAIL: ${{ secrets.EMAIL }}
         GITHUB_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
