@@ -7,6 +7,17 @@ on:
   schedule:
     - cron: '0 0 * * 0,4'
 
+env:
+   GITHUB_EMAIL: ${{ secrets.EMAIL }}
+   GITHUB_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
+   GITHUB_USER: ${{ secrets.USERNAME }}
+   BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+   CHAT_ID: ${{ secrets.CHAT }}
+   BINUTILS_BRANCH: ${{ secrets.BINUTILS_BRANCH }}
+   GCC_BRANCH: ${{ secrets.GCC_BRANCH }}
+   GCC_NAME: ${{ secrets.GCC }}
+   LLVM_BRANCH: ${{ secrets.LLVM_BRANCH }}
+
 jobs:
   build:
 
@@ -32,45 +43,15 @@ jobs:
         git config --global user.email "${GITHUB_EMAIL}"
         git clone https://"${GITHUB_USER}":"${GITHUB_TOKEN}"@github.com/NFS-projects/gcc-arm ../gcc-arm -b 11.x
         rm -rf ../gcc-arm/*
-      env:
-        GITHUB_EMAIL: ${{ secrets.EMAIL }}
-        GITHUB_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
-        GITHUB_USER: ${{ secrets.USERNAME }}
-        BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        CHAT_ID: ${{ secrets.CHAT }}
-        BINUTILS_BRANCH: ${{ secrets.BINUTILS_BRANCH }}
-        GCC_BRANCH: ${{ secrets.GCC_BRANCH }}
-        GCC_NAME: ${{ secrets.GCC }}
-        LLVM_BRANCH: ${{ secrets.LLVM_BRANCH }}
     - name: Building GCC & Binutils
       run: |
         chmod a+x build-*.sh
         curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" -d chat_id="${CHAT_ID}" -d "disable_web_page_preview=true" -d "parse_mode=html" -d text="<b>Starting Build $GCC_NAME GCC ARM (32-bit)</b>"
         ./build-gcc.sh -a arm
-      env:
-        GITHUB_EMAIL: ${{ secrets.EMAIL }}
-        GITHUB_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
-        GITHUB_USER: ${{ secrets.USERNAME }}
-        BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        CHAT_ID: ${{ secrets.CHAT }}
-        BINUTILS_BRANCH: ${{ secrets.BINUTILS_BRANCH }}
-        GCC_BRANCH: ${{ secrets.GCC_BRANCH }}
-        GCC_NAME: ${{ secrets.GCC }}
-        LLVM_BRANCH: ${{ secrets.LLVM_BRANCH }}
     - name: Building llvm
       run: |
         sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
         ./build-lld.sh -a arm
-      env:
-        GITHUB_EMAIL: ${{ secrets.EMAIL }}
-        GITHUB_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
-        GITHUB_USER: ${{ secrets.USERNAME }}
-        BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        CHAT_ID: ${{ secrets.CHAT }}
-        BINUTILS_BRANCH: ${{ secrets.BINUTILS_BRANCH }}
-        GCC_BRANCH: ${{ secrets.GCC_BRANCH }}
-        GCC_NAME: ${{ secrets.GCC }}
-        LLVM_BRANCH: ${{ secrets.LLVM_BRANCH }}
     - name: Push
       run: |
         script_dir=$(pwd)
@@ -83,16 +64,6 @@ jobs:
         git commit -as -m "Release $GCC_NAME GCC ARM $(/bin/date)"  -m "Build completed on: $(/bin/date)" -m "Configuration: $(/bin/cat /tmp/gcc-arm-version)" -m "LLD: $(/bin/cat /tmp/lld-arm-version)"
         git gc
         git push origin 11.x -f
-      env:
-        GITHUB_EMAIL: ${{ secrets.EMAIL }}
-        GITHUB_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
-        GITHUB_USER: ${{ secrets.USERNAME }}
-        BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        CHAT_ID: ${{ secrets.CHAT }}
-        BINUTILS_BRANCH: ${{ secrets.BINUTILS_BRANCH }}
-        GCC_BRANCH: ${{ secrets.GCC_BRANCH }}
-        GCC_NAME: ${{ secrets.GCC }}
-        LLVM_BRANCH: ${{ secrets.LLVM_BRANCH }}
     - uses: yanzay/notify-telegram@v0.1.0
       if: always()
       with:
