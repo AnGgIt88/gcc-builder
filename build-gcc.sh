@@ -63,6 +63,7 @@ build_gcc() {
   echo "Building GCC"
   cd gcc
   ./contrib/download_prerequisites
+  echo "NFS-project" > gcc/DEV-PHASE
   cd ../
   mkdir build-gcc
   cd build-gcc
